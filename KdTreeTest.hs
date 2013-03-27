@@ -3,6 +3,7 @@
 module Main where
 
 import Data.Maybe
+import Data.Point
 import qualified Data.List as L
 
 import Test.QuickCheck
@@ -25,7 +26,7 @@ prop_nearestNeighbor points probe =
           bruteNearestNeighbor :: [Kd.Point3d] -> Kd.Point3d -> Maybe Kd.Point3d
           bruteNearestNeighbor [] _ = Nothing
           bruteNearestNeighbor points probe =
-              Just . head . L.sortBy (Kd.compareDistance probe) $ points
+              Just . head . L.sortBy (compareDistance probe) $ points
 
 prop_nearNeighbors :: [Kd.Point3d] -> Kd.Point3d -> Double -> Bool
 prop_nearNeighbors points probe radius =
@@ -36,7 +37,7 @@ prop_nearNeighbors points probe radius =
           bruteNearNeighbors []     radius _     = []
           bruteNearNeighbors points radius probe =
               filter (withinDistance probe radius) points
-          withinDistance probe radius point = Kd.dist2 probe point <= radius^2
+          withinDistance probe radius point = dist2 probe point <= radius^2
 
 prop_pointsAreClosestToThemselves :: [Kd.Point3d] -> Bool
 prop_pointsAreClosestToThemselves points =
@@ -48,7 +49,7 @@ prop_kNearestNeighborsMatchesBrute points k p =
     L.sort (Kd.kNearestNeighbors tree k p) == L.sort (bruteKnearestNeighbors points k p)
     where tree = Kd.fromList points
           bruteKnearestNeighbors points k p =
-            take k . L.sortBy (Kd.compareDistance p) $ points
+            take k . L.sortBy (compareDistance p) $ points
 
 prop_removeReallyRemovesPoints :: [Kd.Point3d] -> Property
 prop_removeReallyRemovesPoints points = points /= [] ==>
