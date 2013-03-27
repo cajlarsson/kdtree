@@ -27,6 +27,7 @@ source-repository head
 
 Library
   Exposed-modules: Data.Trees.KdTree
+  Exposed-modules: Data.Point
   Build-depends: base < 5
   
 Executable KdTreeTest
