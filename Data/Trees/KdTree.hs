@@ -1,4 +1,6 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE UndecidableInstances #-}
+
 module Data.Trees.KdTree where
   
 import Data.Point
@@ -6,6 +8,7 @@ import Data.Maybe
 
 import qualified Data.Foldable as F
 import qualified Data.List as L
+import qualified Data.Monoid as M
 import Test.QuickCheck
 
 data Point3d = Point3d { p3x :: Double, p3y :: Double, p3z :: Double }
@@ -36,6 +39,11 @@ instance F.Foldable KdTree where
         where init3 = f x init2
               init2 = F.foldr f init r
 
+instance (Point p e) => M.Monoid  (KdTree p) where
+  mempty = KdEmpty
+  mappend treeA treeB = F.foldl' (\xs x -> addPoint x xs) treeB (toList treeA)
+
+
 fromList :: Point p e => [p] -> KdTree p
 fromList points = fromListWithDepth points 0
 
@@ -56,6 +64,25 @@ fromListWithDepth points depth = node
                           kdPoint = sortedPoints !! medianIndex,
                           kdRight = fromListWithDepth (drop (medianIndex+1) sortedPoints) (depth+1),
                           kdAxis = axis }
+
+-- |addPoint inserts a point into a tree
+addPoint :: Point p e => p -> KdTree p -> KdTree p
+addPoint p t = addPointWithDepth p 0 t
+  where
+    addPointWithDepth :: Point p e => p -> Int -> KdTree p -> KdTree p
+    addPointWithDepth p depth KdEmpty = KdNode { kdLeft  = KdEmpty
+                                               , kdPoint = p
+                                               , kdRight = KdEmpty
+                                               , kdAxis  = depth `mod` dimensions p
+                                               }
+    addPointWithDepth p depth oldTree@(KdNode l n r axis)
+      | element axis p <  element axis n  = oldTree { kdLeft = addPointWithDepth p (depth + 1) l}
+      | element axis p >= element axis n     = oldTree { kdRight = addPointWithDepth p (depth + 1) r}
+
+-- |rebalance a tree
+rebalance :: Point p e => KdTree p -> KdTree p
+rebalance = fromList . toList
+
 
 toList :: KdTree p -> [p]
 toList t = F.foldr (:) [] t

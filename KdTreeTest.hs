@@ -5,6 +5,7 @@ module Main where
 import Data.Maybe
 import Data.Point
 import qualified Data.List as L
+import qualified Data.Monoid as M
 
 import Test.QuickCheck
 import Test.QuickCheck.All
@@ -61,5 +62,20 @@ prop_removePreservesInvariant points pKill =
     Kd.allSubtreesAreValid $ tree `Kd.remove` pKill
     where tree = Kd.fromList points
 
+prop_validAfterAddition :: [Kd.Point3d] -> Kd.Point3d -> Bool
+prop_validAfterAddition t p = 
+  Kd.isValid $ Kd.addPoint p (Kd.fromList t)
+
+prop_validAfterAppend :: [Kd.Point3d] -> [Kd.Point3d] -> Bool
+prop_validAfterAppend xs ys = 
+  Kd.isValid $ M.mappend (Kd.fromList xs) (Kd.fromList ys)
+  
+prop_sizeMatchesAfterAppend :: [Kd.Point3d] -> [Kd.Point3d] -> Bool
+prop_sizeMatchesAfterAppend xs ys =
+  length xs + length ys == length total 
+    where
+      total = Kd.toList $ M.mappend (Kd.fromList xs) (Kd.fromList ys)
+
+main :: IO Bool
 main = $quickCheckAll
 
