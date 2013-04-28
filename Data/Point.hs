@@ -18,4 +18,3 @@ class (Ord e, Num e) => Point p e | p -> e where
   -- |dist2 returns the squared distance between two points.
   dist2 ::  p -> p -> e
   
- 
