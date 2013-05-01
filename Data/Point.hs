@@ -3,6 +3,10 @@
 module Data.Point (Point(..)) where
 
 class (Ord e, Num e) => Point p e | p -> e where
+  
+  -- Make a point from a list of coordinates
+  mkPoint :: [e] -> p
+  
   -- number of elements
   dimensions :: p -> Int
   -- the element type should be in Ord

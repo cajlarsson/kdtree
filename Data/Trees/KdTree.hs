@@ -15,12 +15,16 @@ data Point3d = Point3d { p3x :: Double, p3y :: Double, p3z :: Double }
     deriving (Eq, Ord, Show)
 
 instance Point Point3d Double where
-    dimensions _ = 3
+    
+  mkPoint (x:y:z:_) = Point3d x y z
+  mkPoint _         = error "Not enough coordinates to make point."
+  
+  dimensions _ = 3
 
-    element 0 p = p3x p
-    element 1 p = p3y p
-    element 2 p = p3z p
-    dist2 a b = sum $ map (diff2 a b) [0..dimensions a - 1]
+  element 0 p = p3x p
+  element 1 p = p3y p
+  element 2 p = p3z p
+  dist2 a b = sum $ map (diff2 a b) [0..dimensions a - 1]
 
 data KdTree point = KdNode { kdLeft :: KdTree point,
                              kdPoint :: point,
