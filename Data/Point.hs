@@ -1,7 +1,7 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE FlexibleContexts  #-}
 
-module Data.Point (Point(..)) where
+module Data.Point where
 
 class (Ord (Elem p), Num (Elem p)) => Point p where
   
